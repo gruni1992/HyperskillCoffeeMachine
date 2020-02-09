@@ -21,14 +21,14 @@ public class CoffeeMachine {
     }
 
     public static void main(String[] args) {
-        CoffeeMachine machine = new CoffeeMachine(1200, 540, 120, 9, 550);
-        System.out.println(machine);
-        machine.chooseAction();
-        System.out.println(machine);
+        CoffeeMachine machine = new CoffeeMachine(400, 540, 120, 9, 550);
+        while (true) {
+            machine.chooseAction();
+        }
     }
 
     public void chooseAction(){
-        String action = input("Write action (buy, fill, take):");
+        String action = input("Write action (buy, fill, take, remaining, exit):");
         switch (action.toLowerCase()) {
             case "buy":
                 buy();
@@ -39,32 +39,39 @@ public class CoffeeMachine {
             case "take":
                 take();
                 break;
+            case "remaining":
+                System.out.println(this.toString());
+                break;
+            case "exit":
+                System.exit(1);
             default:
                 System.out.println("No such action!");
+
         }
     }
 
     public void buy() {
-        int choice;
-        try {
-            choice = Integer.parseInt(
-                    input("What do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino:"));
-        } catch (NumberFormatException e) {
-            System.out.println("You didn't enter a number. Abort.");
-            return;
-        }
-        switch (choice) {
-            case 1:
-                makeEspresso();
+        String choice = input("What do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino:");
+        switch (choice.toLowerCase()) {
+            case "1":
+                if (ressourcesAvailable(250, 0, 16)){
+                    makeCoffee(250, 0, 16,4);
+                }
                 break;
-            case 2:
-                makeLatte();
+            case "2":
+                if (ressourcesAvailable(350, 75, 20)) {
+                    makeCoffee(350, 75, 20, 7);
+                }
                 break;
-            case 3:
-                makeCappuccino();
+            case "3":
+                if(ressourcesAvailable(200, 100, 12)) {
+                    makeCoffee(200, 100, 12, 6);
+                }
                 break;
+            case "back":
+                return;
             default:
-                System.out.println("You didn't enter a number between 1 and 3. Abort.");
+                System.out.println("You didn't enter a number between 1 and 3 or back. Abort.");
                 return;
         }
     }
@@ -86,27 +93,30 @@ public class CoffeeMachine {
         money = 0;
     }
 
-    public void makeEspresso() {
+    public void makeCoffee(int neededWater, int neededMilk, int neededBeans, int price){
         plasticCups--;
-        water -= 250;
-        beans -= 16;
-        money += 4;
+        water -= neededWater;
+        milk -= neededMilk;
+        beans -= neededBeans;
+        money += price;
     }
 
-    public void makeLatte() {
-        plasticCups--;
-        water -= 350;
-        milk -= 75;
-        beans -= 20;
-        money += 7;
-    }
-
-    public void makeCappuccino() {
-        plasticCups--;
-        water -= 200;
-        milk -= 100;
-        beans -= 12;
-        money += 6;
+    public boolean ressourcesAvailable(int neededWater, int neededMilk, int neededBeans){
+        if(plasticCups < 1) {
+            System.out.println("Sorry not enough disposable cups");
+            return false;
+        } if(neededWater > water) {
+            System.out.println("Sorry not enough water");
+            return false;
+        } if(neededMilk > milk) {
+            System.out.println("Sorry not enough milk");
+            return false;
+        } if(neededBeans > beans) {
+            System.out.println("Sorry not enough coffee beans");
+            return false;
+        }
+        System.out.println("I have enough resources, making you a coffee!");
+        return true;
     }
 
     //Legacy Code from prvious exercises that might be needed again
